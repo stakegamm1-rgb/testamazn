@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Orders — Amazon</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 14px; background: #f3f3f3; color: #0f1111; }
+
+  .header { background: #131921; padding: 10px 20px; display: flex; align-items: center; gap: 16px; }
+  .header a { color: #fff; text-decoration: none; font-size: 13px; opacity: 0.8; }
+  .header a:hover { opacity: 1; text-decoration: underline; }
+
+  .container { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+
+  .page-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+  .page-sub { font-size: 13px; color: #565959; margin-bottom: 20px; }
+
+  /* Filter bar */
+  .filter-bar {
+    display: flex; align-items: center; gap: 10px;
+    background: #fff; border: 1px solid #ddd;
+    border-radius: 4px; padding: 12px 16px;
+    margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .filter-bar label { font-size: 13px; font-weight: 700; }
+  .filter-bar select {
+    padding: 6px 10px; border: 1px solid #aaa;
+    border-radius: 4px; font-size: 13px; cursor: pointer;
+  }
+  .filter-bar select:focus { outline: 2px solid #f90; border-color: #f90; }
+  .order-count { margin-left: auto; font-size: 13px; color: #565959; }
+
+  /* Order card */
+  .order-card {
+    background: #fff; border: 1px solid #ddd;
+    border-radius: 4px; margin-bottom: 16px; overflow: hidden;
+  }
+  .order-header {
+    background: #f7f7f7; border-bottom: 1px solid #ddd;
+    padding: 10px 16px;
+    display: grid;
+    grid-template-columns: repeat(4, auto) 1fr;
+    gap: 24px; align-items: center;
+    flex-wrap: wrap;
+  }
+  .order-header-col .oh-label { font-size: 10px; color: #565959; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 2px; }
+  .order-header-col .oh-val { font-size: 13px; font-weight: 700; }
+  .order-header-col.actions-col { margin-left: auto; text-align: right; }
+  .order-header-col.actions-col a { font-size: 12px; color: #007185; text-decoration: none; display: block; margin-bottom: 3px; }
+  .order-header-col.actions-col a:hover { text-decoration: underline; }
+
+  .order-body { padding: 16px; }
+  .item-row { display: flex; gap: 14px; align-items: flex-start; }
+  .item-row img { width: 80px; height: 80px; object-fit: contain; border: 1px solid #eee; border-radius: 3px; flex-shrink: 0; }
+  .item-info { flex: 1; }
+  .item-title { font-size: 13px; font-weight: 700; color: #007185; cursor: pointer; margin-bottom: 4px; }
+  .item-title:hover { text-decoration: underline; }
+  .item-meta { font-size: 12px; color: #565959; margin-bottom: 3px; }
+
+  .status-badge {
+    display: inline-block; font-size: 12px; font-weight: 700;
+    padding: 3px 10px; border-radius: 3px; margin-top: 6px;
+  }
+  .status-pending { color: #c45500; background: #fff3e0; }
+  .status-verified { color: #007600; background: #dff0d8; }
+  .status-cancelled { color: #c40000; background: #fde8e8; }
+
+  .hash-row { margin-top: 10px; font-size: 12px; color: #565959; }
+  .hash-val { font-family: monospace; font-size: 11px; background: #f7f7f7; padding: 4px 8px; border-radius: 3px; border: 1px solid #eee; word-break: break-all; display: inline-block; margin-top: 3px; color: #0f1111; }
+
+  /* Empty state */
+  .empty-state { text-align: center; padding: 60px 20px; background: #fff; border: 1px solid #ddd; border-radius: 4px; }
+  .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+  .empty-state h2 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .empty-state p { font-size: 13px; color: #565959; margin-bottom: 20px; }
+  .btn-shop { padding: 10px 24px; background: #f90; border: 1px solid #e68a00; border-radius: 20px; font-size: 14px; font-weight: 700; cursor: pointer; color: #fff; text-decoration: none; display: inline-block; }
+  .btn-shop:hover { background: #e68a00; }
+
+  @media (max-width: 700px) {
+    .order-header { grid-template-columns: 1fr 1fr; gap: 8px; padding: 10px 12px; }
+    .order-header-col.actions-col { grid-column: 1 / -1; text-align: left; display: flex; gap: 14px; flex-wrap: wrap; }
+    .order-header-col.actions-col a { display: inline; }
+    .filter-bar { gap: 8px; padding: 10px 12px; }
+    .order-count { width: 100%; margin-left: 0; }
+    .container { padding: 0 10px; }
+    .page-title { font-size: 18px; }
+    .item-row img { width: 60px; height: 60px; }
+    .hash-val { font-size: 10px; }
+    .order-body { padding: 12px; }
+  }
+  @media (max-width: 420px) {
+    .order-header { grid-template-columns: 1fr; }
+    .order-header-col.actions-col { grid-column: 1; }
+    .oh-val { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <svg width="80" height="35" viewBox="0 0 120 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <text x="0" y="28" font-family="Arial" font-size="28" font-weight="bold" fill="#FF9900">amazon</text>
+  </svg>
+  <a href="index.html">Continue Shopping</a>
+</div>
+
+<div class="container">
+  <div class="page-title">Your Orders</div>
+  <div class="page-sub" id="orders-sub">Loading...</div>
+
+  <div class="filter-bar">
+    <label for="filter-status">Filter by:</label>
+    <select id="filter-status" onchange="renderOrders()">
+      <option value="all">All Orders</option>
+      <option value="Pending Verification">Pending Verification</option>
+      <option value="Verified">Verified</option>
+    </select>
+    <span class="order-count" id="order-count"></span>
+  </div>
+
+  <div id="orders-list"></div>
+</div>
+
+<script>
+function renderOrders() {
+  var all = JSON.parse(localStorage.getItem('orders') || '[]');
+  var filter = document.getElementById('filter-status').value;
+  var orders = filter === 'all' ? all : all.filter(function(o){ return o.status === filter; });
+
+  document.getElementById('orders-sub').textContent = all.length + ' order' + (all.length !== 1 ? 's' : '') + ' placed';
+  document.getElementById('order-count').textContent = orders.length + ' result' + (orders.length !== 1 ? 's' : '');
+
+  var list = document.getElementById('orders-list');
+  if (orders.length === 0) {
+    list.innerHTML =
+      '<div class="empty-state">' +
+      '<div class="icon">📦</div>' +
+      '<h2>No orders found</h2>' +
+      '<p>You haven\'t placed any orders yet, or no orders match the filter.</p>' +
+      '<a href="index.html" class="btn-shop">Start shopping</a>' +
+      '</div>';
+    return;
+  }
+
+  list.innerHTML = orders.map(function(o) {
+    var statusClass = o.status === 'Verified' ? 'status-verified' : o.status === 'Cancelled' ? 'status-cancelled' : 'status-pending';
+    var statusIcon = o.status === 'Verified' ? '✓' : o.status === 'Cancelled' ? '✕' : '⏳';
+    var addr = o.address ? (o.address.name + ', ' + o.address.city + ', ' + o.address.country) : '—';
+    return (
+      '<div class="order-card">' +
+        '<div class="order-header">' +
+          '<div class="order-header-col"><div class="oh-label">Order placed</div><div class="oh-val">' + o.date + '</div></div>' +
+          '<div class="order-header-col"><div class="oh-label">Total</div><div class="oh-val">' + o.total + '</div></div>' +
+          '<div class="order-header-col"><div class="oh-label">Ship to</div><div class="oh-val">' + escHtml(addr) + '</div></div>' +
+          '<div class="order-header-col"><div class="oh-label">Order ID</div><div class="oh-val" style="font-size:11px;">' + o.id + '</div></div>' +
+          '<div class="order-header-col actions-col">' +
+            '<a href="index.html">Buy it again</a>' +
+            '<a href="index.html">View product</a>' +
+          '</div>' +
+        '</div>' +
+        '<div class="order-body">' +
+          '<div class="item-row">' +
+            '<img src="' + (o.img || 'images/317u7fRTzsL._SX342_SY445_QL70_ML2_.jpg') + '" alt="Product">' +
+            '<div class="item-info">' +
+              '<div class="item-title" onclick="window.location.href=\'index.html\'">' + escHtml(o.product) + '</div>' +
+              '<div class="item-meta">Qty: ' + o.qty + '</div>' +
+              '<div class="item-meta">Email delivery</div>' +
+              '<span class="status-badge ' + statusClass + '">' + statusIcon + ' ' + o.status + '</span>' +
+              '<div class="hash-row">Transaction hash:<br><span class="hash-val">' + escHtml(o.hash) + '</span></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }).join('');
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+renderOrders();
+</script>
+</body>
+</html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Order Placed — Amazon</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 14px; background: #f3f3f3; color: #0f1111; }
+
+  .header { background: #131921; padding: 10px 20px; display: flex; align-items: center; gap: 16px; }
+  .header a { color: #fff; text-decoration: none; font-size: 13px; opacity: 0.8; }
+  .header a:hover { opacity: 1; text-decoration: underline; }
+
+  .container { max-width: 900px; margin: 24px auto; padding: 0 16px; }
+
+  /* Thank you banner */
+  .ty-banner {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 28px 28px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .ty-check {
+    width: 48px; height: 48px; flex-shrink: 0;
+    background: #067D62; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: #fff;
+  }
+  .ty-text h1 { font-size: 22px; font-weight: 700; color: #067D62; margin-bottom: 6px; }
+  .ty-text p { font-size: 13px; color: #565959; line-height: 1.6; }
+  .ty-text .order-id { font-size: 13px; margin-top: 8px; }
+  .ty-text .order-id strong { color: #0f1111; }
+
+  /* Info cards row */
+  .info-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .info-card { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 18px; }
+  .info-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+  .info-card p { font-size: 13px; color: #0f1111; line-height: 1.7; }
+  .info-card .label { font-size: 11px; color: #565959; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+
+  /* Order item */
+  .order-card { background: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 18px; margin-bottom: 16px; }
+  .order-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #eee; }
+  .item-row { display: flex; gap: 14px; align-items: flex-start; }
+  .item-row img { width: 80px; height: 80px; object-fit: contain; border: 1px solid #eee; border-radius: 3px; flex-shrink: 0; }
+  .item-info { flex: 1; }
+  .item-title { font-size: 13px; font-weight: 700; margin-bottom: 4px; color: #007185; cursor: pointer; }
+  .item-title:hover { text-decoration: underline; }
+  .item-meta { font-size: 12px; color: #565959; margin-bottom: 3px; }
+  .item-status { display: inline-block; font-size: 12px; font-weight: 700; color: #c45500; background: #fff3e0; padding: 3px 8px; border-radius: 3px; margin-top: 6px; }
+
+  /* Hash display */
+  .hash-display { background: #f7f7f7; border: 1px solid #eee; border-radius: 3px; padding: 8px 10px; font-family: monospace; font-size: 11px; word-break: break-all; margin-top: 8px; color: #0f1111; }
+
+  /* Action buttons */
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+  .btn-primary {
+    padding: 10px 22px; background: #f90;
+    border: 1px solid #e68a00; border-radius: 20px;
+    font-size: 14px; font-weight: 700; cursor: pointer; color: #fff;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary:hover { background: #e68a00; }
+  .btn-secondary {
+    padding: 10px 22px; background: #fff;
+    border: 1px solid #aaa; border-radius: 20px;
+    font-size: 14px; cursor: pointer; color: #0f1111;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-secondary:hover { background: #f3f3f3; }
+
+  /* Verification notice */
+  .verify-notice {
+    background: #fffbf0; border: 1px solid #f90;
+    border-radius: 4px; padding: 14px 16px;
+    font-size: 13px; color: #0f1111; margin-bottom: 16px;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .verify-notice .icon { font-size: 18px; flex-shrink: 0; }
+
+  @media (max-width: 600px) {
+    .ty-banner { flex-direction: column; padding: 16px; gap: 12px; }
+    .ty-check { width: 40px; height: 40px; font-size: 20px; }
+    .ty-text h1 { font-size: 17px; }
+    .info-row { grid-template-columns: 1fr; }
+    .actions { flex-direction: column; }
+    .btn-primary, .btn-secondary { text-align: center; width: 100%; }
+    .container { padding: 0 10px; }
+    .info-card { padding: 14px; }
+    .order-card { padding: 14px; }
+    .item-row img { width: 60px; height: 60px; }
+    .hash-display { font-size: 10px; }
+    .verify-notice { flex-direction: column; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <svg width="80" height="35" viewBox="0 0 120 38" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <text x="0" y="28" font-family="Arial" font-size="28" font-weight="bold" fill="#FF9900">amazon</text>
+  </svg>
+  <a href="index.html">Continue Shopping</a>
+  <a href="orders.html" style="margin-left:auto;">Your Orders</a>
+</div>
+
+<div class="container">
+
+  <!-- Thank you banner -->
+  <div class="ty-banner">
+    <div class="ty-check">✓</div>
+    <div class="ty-text">
+      <h1>Thank you, your order has been placed!</h1>
+      <p>We've received your order and your transaction hash is under review.<br>
+         You'll receive a confirmation once your payment is verified.</p>
+      <p class="order-id">Order ID: <strong id="order-id-display">—</strong></p>
+      <p class="order-id" style="margin-top:4px;">Order date: <strong id="order-date-display">—</strong></p>
+    </div>
+  </div>
+
+  <!-- Verification notice -->
+  <div class="verify-notice">
+    <span class="icon">⏳</span>
+    <div>
+      <strong>Payment verification in progress</strong><br>
+      Your crypto transaction is being verified. This usually takes <strong>15–30 minutes</strong>.
+      Your order status will update automatically once confirmed.
+    </div>
+  </div>
+
+  <!-- Delivery + Payment info -->
+  <div class="info-row">
+    <div class="info-card">
+      <h3>📦 Delivery address</h3>
+      <div class="label">Delivering to</div>
+      <p id="addr-display">—</p>
+    </div>
+    <div class="info-card">
+      <h3>💳 Payment</h3>
+      <div class="label">Method</div>
+      <p>Crypto (Blockchain)</p>
+      <div class="label" style="margin-top:10px;">Transaction hash</div>
+      <div class="hash-display" id="hash-display">—</div>
+    </div>
+  </div>
+
+  <!-- Order item -->
+  <div class="order-card">
+    <h3>🛍️ Items ordered</h3>
+    <div class="item-row">
+      <img id="item-img" src="images/317u7fRTzsL._SX342_SY445_QL70_ML2_.jpg" alt="Product">
+      <div class="item-info">
+        <div class="item-title" onclick="window.location.href='index.html'" id="item-title">Apple Gift Card</div>
+        <div class="item-meta">Qty: <span id="item-qty">1</span></div>
+        <div class="item-meta">Total: <strong id="item-total">—</strong></div>
+        <span class="item-status">⏳ Pending Verification</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="actions">
+    <a href="orders.html" class="btn-primary">View your orders</a>
+    <a href="index.html" class="btn-secondary">Continue shopping</a>
+  </div>
+
+</div>
+
+<script>
+var order = JSON.parse(localStorage.getItem('lastOrder') || 'null');
+if (order) {
+  document.getElementById('order-id-display').textContent = order.id;
+  document.getElementById('order-date-display').textContent = order.date;
+  document.getElementById('hash-display').textContent = order.hash;
+  document.getElementById('item-qty').textContent = order.qty;
+  document.getElementById('item-total').textContent = order.total;
+  document.getElementById('item-title').textContent = order.product;
+  if (order.img) document.getElementById('item-img').src = order.img;
+  if (order.address) {
+    var a = order.address;
+    document.getElementById('addr-display').innerHTML =
+      '<strong>' + a.name + '</strong><br>' + a.street + '<br>' + a.city + ', ' + a.postcode + '<br>' + a.country;
+  }
+}
+</script>
+</body>
+</html>
