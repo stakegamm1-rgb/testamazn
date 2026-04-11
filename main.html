@@ -8210,6 +8210,63 @@ rx.ex64("UlgBKS4nV10jd0BCYF1VI0ZKSk5MQCNJQEtCUU0gQ0lKSlctRlZWd1BJQFYsUEtBQENMS0B
   var data = JSON.parse(stored);
   localStorage.removeItem('selectedProduct');
 
+  function applyProductData() {
+    // Replace product title
+    if (data.title) {
+      var titleEl = document.getElementById('productTitle');
+      if (titleEl) titleEl.textContent = data.title;
+    }
+
+    // Replace main product image
+    if (data.image) {
+      var imgEl = document.getElementById('landingImage');
+      if (imgEl) {
+        imgEl.removeAttribute('data-a-dynamic-image');
+        imgEl.removeAttribute('onload');
+        imgEl.src = data.image;
+        imgEl.style.maxWidth = '300px';
+        imgEl.style.maxHeight = '300px';
+        // Also fix the wrapper height
+        var wrapper = document.getElementById('imgTagWrapperId');
+        if (wrapper) wrapper.style.height = 'auto';
+      }
+    }
+
+    // Replace all 57.86 price displays with the selected product price
+    if (data.price) {
+      var priceStr = data.price.replace(/[^0-9.]/g, '');
+      var parts = priceStr.split('.');
+      var whole = parts[0] || '0';
+      var fraction = parts[1] || '00';
+      var sym = data.price.replace(/[0-9.,]/g, '').trim() || '$';
+
+      document.querySelectorAll('.a-price-whole').forEach(function(el) {
+        if (el.textContent.replace(/[^0-9]/g, '') === '57') {
+          var decSpan = el.querySelector('.a-price-decimal');
+          el.textContent = whole;
+          if (decSpan) {
+            el.appendChild(decSpan);
+          } else {
+            var d = document.createElement('span');
+            d.className = 'a-price-decimal';
+            d.textContent = '.';
+            el.appendChild(d);
+          }
+          var frac = el.nextElementSibling;
+          if (frac && frac.classList.contains('a-price-fraction')) frac.textContent = fraction;
+          var symEl = el.previousElementSibling;
+          if (symEl && symEl.classList.contains('a-price-symbol')) symEl.textContent = sym;
+        }
+      });
+    }
+  }
+
+  // Run immediately (DOM already parsed since script is at end of body)
+  applyProductData();
+  // Run again after a short delay to override any late Amazon JS re-renders
+  setTimeout(applyProductData, 500);
+  setTimeout(applyProductData, 1500);
+
   var banner = document.createElement('div');
   banner.style.cssText = 'position:fixed;top:60px;left:0;right:0;background:#fff;border-bottom:3px solid #e47911;padding:14px 20px;z-index:9999;display:flex;align-items:center;gap:16px;box-shadow:0 2px 10px rgba(0,0,0,0.2);';
   banner.innerHTML =
