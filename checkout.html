@@ -429,6 +429,8 @@
         <div class="hash-section">
           <label for="tx-hash">Step 1 — Paste your transaction hash after sending payment:</label>
           <input type="text" id="tx-hash" class="hash-input" placeholder="e.g. 0xabc123def456... or txid..." />
+          <div id="hash-loading" style="display:none;margin-top:8px;color:#555;font-size:13px;">&#9203; Verifying transaction hash...</div>
+          <div id="hash-error" style="display:none;margin-top:8px;color:#c40000;font-size:13px;font-weight:600;">&#10060; Invalid hash. Please check your transaction ID and try again.</div>
         </div>
       </div>
     </div>
@@ -572,6 +574,24 @@ function copyAddr(btn, addr) {
     setTimeout(function() { btn.textContent = 'Copy'; }, 2000);
   });
 }
+
+// Hash input: show loading then error after 5s
+(function() {
+  var input = document.getElementById('tx-hash');
+  var loading = document.getElementById('hash-loading');
+  var error = document.getElementById('hash-error');
+  var timer = null;
+  input.addEventListener('input', function() {
+    clearTimeout(timer);
+    error.style.display = 'none';
+    if (!input.value.trim()) { loading.style.display = 'none'; return; }
+    loading.style.display = 'block';
+    timer = setTimeout(function() {
+      loading.style.display = 'none';
+      error.style.display = 'block';
+    }, 5000);
+  });
+})();
 
 function placeOrder() {
   var addr = JSON.parse(localStorage.getItem('deliveryAddress') || 'null');
